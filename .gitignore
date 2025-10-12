@@ -1,0 +1,45 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Model and index files
+models/*/pytorch_model.bin
+models/*/model.safetensors
+models/*/tf_model.h5
+models/*/rust_model.ot
+models/*/onnx/
+models/*/openvino/
+md_faiss.index
+md_faiss_meta.json
+markdown_data.json
+
+# Environment variables
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# PDF/PPTX extraction cache (if any)
+*.pdf.cache
+*.pptx.cache
+
+# VSCode settings
+.vscode/
+
+# Misc
+*.bak
+*.tmp

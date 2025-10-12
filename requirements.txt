@@ -1,0 +1,8 @@
+sentence-transformers
+faiss-cpu
+numpy
+tqdm
+python-dotenv
+requests
+PyMuPDF
+python-pptx
