@@ -72,10 +72,11 @@ for path in md_files:
     try:
         with open(path, 'r', encoding='utf-8') as f:
             content = f.read()
-        if content.strip():  # 只处理非空内容
+        content_stripped = content.strip()
+        if len(content_stripped) >= 300:
             md_data.append({'path': path, 'content': content, 'type': 'md'})
         else:
-            print(f"[跳过空md] {path}")
+            print(f"[跳过过短md] {path} ({len(content_stripped)} chars)")
     except Exception as e:
         print(f"Error reading {path}: {e}")
     md_done += 1

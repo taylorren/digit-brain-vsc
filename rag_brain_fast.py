@@ -13,10 +13,10 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
 OLLAMA_URL = "http://localhost:11434/api/generate"
 OLLAMA_MODEL = "qwen3:1.7b"
 
-# 配置 Zhipu
-ZHIPU_API_KEY = os.environ.get("ZHIPU_API_KEY")
-ZHIPU_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
-ZHIPU_MODEL = "glm-4-air"
+# 配置 DeepSeek
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY")
+DEEPSEEK_URL = "https://api.deepseek.com/chat/completions"
+DEEPSEEK_MODEL = "deepseek-chat"
 
 # ⚡ Performance optimization: Load model and index only once
 print("⚡ 快速启动优化版 - 加载模型中...")
@@ -52,7 +52,7 @@ def search(query, top_k=15):
     return results
 
 
-def rag_ask(query, top_k=15, use_zhipu=False):
+def rag_ask(query, top_k=15, use_deepseek=False):
     """
     优化版RAG问答函数
     """
@@ -125,23 +125,23 @@ def rag_ask(query, top_k=15, use_zhipu=False):
         "请按要求回答，每个观点都要标注来源，特别注意引用PPT和PDF文件内容："
     )
     
-    if use_zhipu:
-        return _call_zhipu(prompt)
+    if use_deepseek:
+        return _call_deepseek(prompt)
     else:
         return _call_ollama(prompt, docs)
 
 
-def _call_zhipu(prompt):
-    """调用智谱AI"""
-    if not ZHIPU_API_KEY:
-        return "[Zhipu API Key 未设置，请设置环境变量 ZHIPU_API_KEY]"
+def _call_deepseek(prompt):
+    """调用DeepSeek AI"""
+    if not DEEPSEEK_API_KEY:
+        return "[DeepSeek API Key 未设置，请设置环境变量 DEEPSEEK_API_KEY]"
     
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {ZHIPU_API_KEY}"
+        "Authorization": f"Bearer {DEEPSEEK_API_KEY}"
     }
     data = {
-        "model": ZHIPU_MODEL,
+        "model": DEEPSEEK_MODEL,
         "messages": [
             {"role": "system", "content": "你是一个有用的AI助手。"},
             {"role": "user", "content": prompt}
@@ -151,17 +151,17 @@ def _call_zhipu(prompt):
     }
     try:
         ai_start = time.time()
-        print("[3/3] 🤖 正在等待智谱AI生成回答...")
-        resp = requests.post(ZHIPU_URL, headers=headers, json=data, timeout=120)
+        print("[3/3] 🤖 正在等待DeepSeek AI生成回答...")
+        resp = requests.post(DEEPSEEK_URL, headers=headers, json=data, timeout=120)
         resp.raise_for_status()
         result = resp.json()
         ai_time = time.time() - ai_start
         print(f"⚡ AI回答生成耗时: {ai_time:.2f}s")
         
-        content = result.get("choices", [{}])[0].get("message", {}).get("content", "[智谱未返回内容]")
+        content = result.get("choices", [{}])[0].get("message", {}).get("content", "[DeepSeek未返回内容]")
         return content.strip()
     except Exception as e:
-        return f"[智谱调用失败: {e}]"
+        return f"[DeepSeek调用失败: {e}]"
 
 
 def _call_ollama(prompt, docs):
@@ -198,32 +198,32 @@ def _call_ollama(prompt, docs):
 
 
 if __name__ == '__main__':
-    use_zhipu = False
+    use_deepseek = False
     print("\n🧠 数字大脑 - 性能优化版 ⚡")
     print("✨ 优化：快速启动、性能监控、智能过滤")
     print("\n命令说明:")
-    print("  zhipu  - 切换到智谱AI")
-    print("  ollama - 切换到Ollama本地模型")
-    print("  exit   - 退出程序")
+    print("  deepseek - 切换到DeepSeek AI")
+    print("  ollama   - 切换到Ollama本地模型")
+    print("  exit     - 退出程序")
     
     while True:
         query = input('\n💭 请输入你的问题: ')
         if query.lower() == 'exit':
             print("👋 再见！")
             break
-        if query.lower() == 'zhipu':
-            use_zhipu = True
-            print("✅ 已切换到智谱AI模式")
+        if query.lower() == 'deepseek':
+            use_deepseek = True
+            print("✅ 已切换到DeepSeek AI模式")
             continue
         if query.lower() == 'ollama':
-            use_zhipu = False
+            use_deepseek = False
             print("✅ 已切换到Ollama本地模式")
             continue
             
         if query.strip():
             total_start = time.time()
             print('\n🚀 开始处理...')
-            answer = rag_ask(query, use_zhipu=use_zhipu)
+            answer = rag_ask(query, use_deepseek=use_deepseek)
             total_time = time.time() - total_start
             print(f'\n📝 【任老师的回答】\n{answer}\n')
             print(f"⚡ 总耗时: {total_time:.2f}s")
